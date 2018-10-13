@@ -1,13 +1,15 @@
 #include "wComparer.h"
 
-int wGetNumber(wchar_t **pointer, wchar_t *endPointer)
+int wGetNumber(wchar_t **pointer)
 {
     int z = 1;
     int number = 0;
-    for (; *pointer <= endPointer && iswdigit(**pointer); z *= 10)
+
+    while (**pointer != 0 && iswdigit(**pointer))
     {
         number = z * number + (**pointer - 48);
         (*pointer)++;
+        z *= 10;
     }
     return number;
 }
@@ -19,24 +21,21 @@ int wCompare(wstring x, wstring y)
     auto xEndPointer = &x[x.length() - 1];
     auto yEndPointer = &y[y.length() - 1];
 
-    while (xPointer <= xEndPointer)
+    while (*xPointer != 0)
     {
-        if (yPointer > yEndPointer)
+        if (yPointer == 0)
             return 1;
-        if (iswdigit(*xPointer))
+        if (iswdigit(*xPointer) && iswdigit(*yPointer))
         {
-            if (iswdigit(*yPointer))
-            {
-                auto xNum = wGetNumber(&xPointer, xEndPointer);
-                auto yNum = wGetNumber(&yPointer, yEndPointer);
+                auto xNum = wGetNumber(&xPointer);
+                auto yNum = wGetNumber(&yPointer);
                 if (xNum != yNum)
                     return xNum > yNum ? 1 : -1;
-            }
         }
         if (*xPointer != *yPointer)
             return *xPointer > *yPointer ? 1 : -1;
         yPointer++;
         xPointer++;
     }
-    return yPointer > yEndPointer ? 0 : -1;
+    return yPointer == 0 ? 0 : -1;
 }
